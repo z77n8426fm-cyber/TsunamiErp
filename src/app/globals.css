@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* ============================================================
+   TSUNAMI ERP — Sistema de diseño
+   Paleta: azul oscuro (marca), blanco y grises.
+   Modo claro y oscuro mediante la clase .dark en <html>.
+   ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Marca: azul profundo "Tsunami" */
+  --color-brand-50: #eef4fb;
+  --color-brand-100: #d9e6f5;
+  --color-brand-200: #b3cdeb;
+  --color-brand-300: #7fabdc;
+  --color-brand-400: #4a86c8;
+  --color-brand-500: #2b68ad;
+  --color-brand-600: #1f5192;
+  --color-brand-700: #1b4276;
+  --color-brand-800: #193a62;
+  --color-brand-900: #142c4b;
+  --color-brand-950: #0b1a2e;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-in: fade-in 0.25s ease-out;
+  --animate-slide-up: slide-up 0.3s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Variables semánticas por tema */
+:root {
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --surface-hover: #f1f3f6;
+  --border: #e4e7ec;
+  --foreground: #101828;
+  --muted: #667085;
+}
+
+.dark {
+  --background: #0b1220;
+  --surface: #111a2c;
+  --surface-hover: #16223a;
+  --border: #1e2a44;
+  --foreground: #eef2f8;
+  --muted: #8b98ad;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar sutil acorde al tema */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+/* Transición suave al cambiar de tema */
+body,
+.bg-surface,
+.bg-background {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
