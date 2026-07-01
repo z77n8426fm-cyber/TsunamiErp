@@ -1,0 +1,63 @@
+# ============================================================
+# TSUNAMI ERP — Ejecución automática de migraciones
+#
+# Aplica los archivos de supabase/migrations/ a la base de datos
+# del proyecto usando Supabase CLI. Requiere el secreto:
+#   SUPABASE_DB_URL → cadena de conexión "Session pooler" de
+#   Supabase (Dashboard → Connect), con la contraseña incluida.
+#
+# Se ejecuta al hacer push de cambios en las migraciones o
+# manualmente desde la pestaña Actions ("Run workflow").
+# ============================================================
+name: Migraciones de base de datos
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - claude/tsunami-import-erp-q6b4sg
+    paths:
+      - "supabase/migrations/**"
+      - ".github/workflows/db-migrations.yml"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Verificar que el secreto esté configurado
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Falta el secreto SUPABASE_DB_URL. Agrégalo en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Secreto configurado correctamente."
+
+      - name: Instalar Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Aplicar migraciones
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --include-all --yes
+
+      - name: Verificar resultado (tablas, vistas y datos iniciales)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          psql "$SUPABASE_DB_URL" -c "
+            select
+              (select count(*) from information_schema.tables
+                where table_schema = 'public' and table_type = 'BASE TABLE') as tablas,
+              (select count(*) from information_schema.views
+                where table_schema = 'public') as vistas,
+              (select count(*) from public.warehouses) as almacenes,
+              (select count(*) from public.categories) as categorias;
+          "
